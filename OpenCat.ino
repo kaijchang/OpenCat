@@ -62,7 +62,7 @@
 // #define VOICE_LD3320    //for LD3320 module
 // #define PIR             //for PIR (Passive Infrared) sensor
 //#define DOUBLE_TOUCH  //for double touch sensor
-//#define DOUBLE_LIGHT  //for double light sensor
+// #define DOUBLE_LIGHT  //for double light sensor
 // #define DOUBLE_INFRARED_DISTANCE  //for double infrared distance sensor
 // #define GESTURE  //for Gesture module
 // #define CAMERA  //for human body tracking or ball tracking using an intelligent camera
@@ -75,9 +75,13 @@
 // https://github.com/PetoiCamp/NonCodeFiles/blob/master/stl/bone.stl
 // After uploading the code, you may need to press the reset buttons on the module and then the NyBoard.
 // The tracking demo works the best with a yellow tennis ball or some other round objects. Demo: https://www.youtube.com/watch?v=CxGI-MzCGWM
-// #define GROVE_SERIAL_PASS_THROUGH  //allow analog/digital read/write GPIO pins through serial protocol
-// #define OTHER_MODULES  //uncomment this line to disable the gyroscope code to save programming resources for other modules.
+// #define GROVE_SERIAL_PASS_THROUGH  //allow analog/digital read/wri o998te GPIO pins through serial protocol
+ #define OTHER_MODULES  //uncomment this line to disable the gyroscope code to save programming resources for other modules.
 // #define ROBOT_ARM
+#define LIGHT1 A2
+#define LIGHT2 A3
+#define IN1 LIGHT1
+#define IN2 LIGHT2
 
 #define IR_PIN 4  // Signal Pin of IR receiver to Arduino Digital Pin 4
 #include "src/OpenCat.h"
@@ -132,19 +136,18 @@ void loop() {
 int prevReading = 0;
 void otherModule() {  //this is an example that use the analog input pin A2 as a touch pad
                       //The A2 pin is in the second Grove socket of the NyBoard
-  int currentReading = analogRead(A2);
-  if (abs(currentReading - prevReading) > 50) {  //filter noise
+  int a = analogRead(IN1);
+  Serial.print(a);
+  int currentReading = analogRead(IN1);
+  if (abs(currentReading - prevReading) >= 0) {  //filter noise
     PT("Reading on pin A2:\t");
     PTL(currentReading);
-    if (currentReading < 100) {  //touch and hold on the A2 pin until the condition is met
+    if (currentReading < 25) {  //touch and hold on the A2 pin until the condition is met
       beep(10, 20, 50, 3);       //make sound within this function body
-      tQueue->createTask();      //more tokens are defined in OpenCat.h
+      tQueue->addTask('k', "sit", 1000);
+      tQueue->addTask('k', "trL", 10000);
     } else {
-      strcpy(newCmd, "sit");          //load a skill to be processed by the later reaction function
-      if (strcmp(lastCmd, newCmd)) {  //won't repeatively load the same skill
-        newCmdIdx = 5;
-        token = T_SKILL;  //T_SKILL loads a skill
-      }
+      tQueue->addTask('k', "wkF");
     }
   }
   prevReading = currentReading;
