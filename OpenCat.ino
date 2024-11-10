@@ -143,8 +143,8 @@ void otherModule() {  //this is an example that use the analog input pin A2 as a
   PT("Right Reading (A3):\t");
   PTL(currentRightReading);
   int averageReading = (currentLeftReading + currentRightReading) / 2;
-  if (averageReading < 50) {  //touch and hold on the A2 pin until the condition is met
-    beep(10, 20, 50, 3);       //make sound within this function body
+  if (averageReading < 50) {
+    beep(10, 20, 50, 3);
     if (currentLeftReading > currentRightReading) {
       tQueue->addTask('k', "trR", 1000);
     } else {
