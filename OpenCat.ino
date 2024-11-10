@@ -76,7 +76,7 @@
 // After uploading the code, you may need to press the reset buttons on the module and then the NyBoard.
 // The tracking demo works the best with a yellow tennis ball or some other round objects. Demo: https://www.youtube.com/watch?v=CxGI-MzCGWM
 // #define GROVE_SERIAL_PASS_THROUGH  //allow analog/digital read/wri o998te GPIO pins through serial protocol
- #define OTHER_MODULES  //uncomment this line to disable the gyroscope code to save programming resources for other modules.
+//#define OTHER_MODULES  //uncomment this line to disable the gyroscope code to save programming resources for other modules.
 // #define ROBOT_ARM
 #define LIGHT1 A2
 #define LIGHT2 A3
@@ -133,23 +133,25 @@ void loop() {
 }
 
 #ifdef OTHER_MODULES  //remember to activate the #define OTHER_MODULES at the begining of this code to activate the following section
-int prevReading = 0;
 void otherModule() {  //this is an example that use the analog input pin A2 as a touch pad
                       //The A2 pin is in the second Grove socket of the NyBoard
-  int a = analogRead(IN1);
-  Serial.print(a);
-  int currentReading = analogRead(IN1);
-  if (abs(currentReading - prevReading) >= 0) {  //filter noise
-    PT("Reading on pin A2:\t");
-    PTL(currentReading);
-    if (currentReading < 25) {  //touch and hold on the A2 pin until the condition is met
-      beep(10, 20, 50, 3);       //make sound within this function body
-      tQueue->addTask('k', "sit", 1000);
-      tQueue->addTask('k', "trL", 10000);
+
+  int currentLeftReading = analogRead(IN1);
+  PT("Left Reading (A2):\t");
+  PTL(currentLeftReading);
+  int currentRightReading = analogRead(IN2);
+  PT("Right Reading (A3):\t");
+  PTL(currentRightReading);
+  int averageReading = (currentLeftReading + currentRightReading) / 2;
+  if (averageReading < 50) {  //touch and hold on the A2 pin until the condition is met
+    beep(10, 20, 50, 3);       //make sound within this function body
+    if (currentLeftReading > currentRightReading) {
+      tQueue->addTask('k', "trR", 1000);
     } else {
-      tQueue->addTask('k', "wkF");
+      tQueue->addTask('k', "trL", 1000);
     }
+  } else {
+    tQueue->addTask('k', "wkF");
   }
-  prevReading = currentReading;
 }
 #endif
